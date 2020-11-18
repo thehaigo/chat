@@ -9,6 +9,7 @@ defmodule Chat.Users.User do
     field :hashed_password, :string
     field :confirmed_at, :naive_datetime
 
+    has_many :rooms, Chat.Rooms.Room
     timestamps()
   end
 

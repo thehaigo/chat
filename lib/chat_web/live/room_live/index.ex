@@ -5,8 +5,9 @@ defmodule ChatWeb.RoomLive.Index do
   alias Chat.Rooms.Room
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :rooms, list_rooms())}
+  def mount(_params, session, socket) do
+    user = Chat.Users.get_user_by_session_token(session["user_token"])
+    {:ok, assign(socket |> assign(:user, user), :rooms, list_rooms())}
   end
 
   @impl true
@@ -23,7 +24,7 @@ defmodule ChatWeb.RoomLive.Index do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Room")
-    |> assign(:room, %Room{})
+    |> assign(:room, %Room{user_id: socket.assigns.user.id})
   end
 
   defp apply_action(socket, :index, _params) do

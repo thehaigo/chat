@@ -5,7 +5,7 @@ defmodule Chat.Users do
 
   import Ecto.Query, warn: false
   alias Chat.Repo
-  alias Chat.Guardian  
+  alias Chat.Guardian
   alias Chat.Users.{User, UserToken, UserNotifier}
 
   ## Database getters
@@ -42,6 +42,11 @@ defmodule Chat.Users do
       when is_binary(email) and is_binary(password) do
     user = Repo.get_by(User, email: email)
     if User.valid_password?(user, password), do: user
+  end
+
+  def get_user_by_session_token(token) do
+    {:ok, query} = UserToken.verify_session_token_query(token)
+    Repo.one(query)
   end
 
   @doc """
