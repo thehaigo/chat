@@ -10,6 +10,11 @@ use Mix.Config
 config :chat,
   ecto_repos: [Chat.Repo]
 
+
+config :chat, Chat.Guardian,
+  issuer: "chat",
+  secret_key: "qcI2thcwrKbc/HGWqbG9DS8XR1v6agjv/poOlZEUESgI9CYkSuY6JFHBEPv5lIKm"
+
 # Configures the endpoint
 config :chat, ChatWeb.Endpoint,
   url: [host: "localhost"],

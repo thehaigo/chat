@@ -5,6 +5,7 @@ defmodule Chat.Users do
 
   import Ecto.Query, warn: false
   alias Chat.Repo
+  alias Chat.Guardian  
   alias Chat.Users.{User, UserToken, UserNotifier}
 
   ## Database getters
@@ -236,6 +237,17 @@ defmodule Chat.Users do
   def delete_session_token(token) do
     Repo.delete_all(UserToken.token_and_context_query(token, "session"))
     :ok
+  end
+
+  @doc """
+  Generates a JWT
+  """
+  def token_sign_in(email, password) do
+    if user = get_user_by_email_and_password(email, password) do
+      Guardian.encode_and_sign(user)
+    else
+      {:error, :unauthorized}
+    end
   end
 
   ## Confirmation

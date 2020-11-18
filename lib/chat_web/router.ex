@@ -17,16 +17,26 @@ defmodule ChatWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :jwt_authenticated do
+    plug ApiAuthPipeline
+  end
+
   scope "/", ChatWeb do
     pipe_through :browser
 
     live "/", PageLive, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", ChatWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", ChatWeb do
+    pipe_through :api
+
+    post "/sign_up", Api.UserController, :sign_up
+    post "/sign_in", Api.UserController, :sign_in
+  end
+
+  scope "/api", ChatWeb do
+    pipe_through [:api, :jwt_authenticated]
+  end
 
   # Enables LiveDashboard only for development
   #
