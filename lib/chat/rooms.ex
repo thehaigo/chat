@@ -7,6 +7,7 @@ defmodule Chat.Rooms do
   alias Chat.Repo
 
   alias Chat.Rooms.Room
+  alias Chat.Rooms.Message
 
   @doc """
   Returns the list of rooms.
@@ -37,6 +38,11 @@ defmodule Chat.Rooms do
   """
   def get_room!(id), do: Repo.get!(Room, id)
 
+  def get_room_with_messages!(id) do
+    Room
+    |> preload(messages: :user)
+    |> Repo.get!(id)
+  end
   @doc """
   Creates a room.
 
@@ -55,6 +61,11 @@ defmodule Chat.Rooms do
     |> Repo.insert()
   end
 
+  def create_message(attrs \\ %{}) do
+    %Message{}
+    |> Message.changeset(attrs)
+    |> Repo.insert()
+  end
   @doc """
   Updates a room.
 
@@ -100,5 +111,9 @@ defmodule Chat.Rooms do
   """
   def change_room(%Room{} = room, attrs \\ %{}) do
     Room.changeset(room, attrs)
+  end
+
+  def change_message(%Message{} = message, attrs \\ %{}) do
+    Message.changeset(message, attrs)
   end
 end
