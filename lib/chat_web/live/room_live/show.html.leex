@@ -1,16 +1,4 @@
-<h1>Show Room</h1>
-
-<%= if @live_action in [:edit] do %>
-  <%= live_modal @socket, ChatWeb.RoomLive.FormComponent,
-    id: @room.id,
-    title: @page_title,
-    action: @live_action,
-    room: @room,
-    return_to: Routes.room_show_path(@socket, :show, @room) %>
-<% end %>
-
 <ul>
-
   <li>
     <strong>Name:</strong>
     <%= @room.name %>
@@ -20,8 +8,30 @@
     <strong>Description:</strong>
     <%= @room.description %>
   </li>
+  <table>
+    <tbody id="messages">
+      <%= for message <- @messages do %>
+        <tr id="message-<%= message.id %>">
+          <td><%= message.body %></td>
+          <td><%= message.user.email %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <div>
+    <%= f = form_for @changeset, "#",
+      id: "board-form",
+      phx_submit: "save" %>
 
+      <%= textarea f, :body, class: "form-control" %>
+      <%= error_tag f, :body %>
+
+      <%= hidden_input f, :user_id %>
+      <%= hidden_input f, :room_id %>
+
+      <%= submit "Save", phx_disable_with: "Saving..." %>
+    </form>
+  </div>
 </ul>
 
-<span><%= live_patch "Edit", to: Routes.room_show_path(@socket, :edit, @room), class: "button" %></span>
 <span><%= live_redirect "Back", to: Routes.room_index_path(@socket, :index) %></span>
