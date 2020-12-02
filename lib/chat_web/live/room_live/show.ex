@@ -2,7 +2,7 @@ defmodule ChatWeb.RoomLive.Show do
   use ChatWeb, :live_view
   alias Chat.Rooms
   alias Chat.Rooms.Message
-
+  alias ChatWeb.Presence
 
   @impl true
   def mount(%{"id" => id}, session, socket) do
@@ -12,6 +12,8 @@ defmodule ChatWeb.RoomLive.Show do
     return_to = Routes.room_show_path(socket, :show, room)
 
     ChatWeb.Endpoint.subscribe("room:#{id}")
+    Presence.track_presence(self(), "room:#{room.id}", user.id, %{ email: user.email, id: user.id})
+
     {:ok,
       socket
       |> assign(:page_title, page_title(socket.assigns.live_action))
@@ -20,6 +22,7 @@ defmodule ChatWeb.RoomLive.Show do
       |> assign(:return_to, return_to)
       |> assign(:changeset, changeset)
       |> assign(:user, user)
+      |> assign(:users, Presence.list_presence("room:#{room.id}"))
     }
   end
 
@@ -41,6 +44,10 @@ defmodule ChatWeb.RoomLive.Show do
 
   def handle_info(%{event: "broadcast_message", payload: state}, socket) do
     {:noreply, assign(socket, state)}
+  end
+
+  def handle_info(%{event: "presence_diff"}, socket = %{assigns: %{room: room}}) do
+    {:noreply, assign(socket, users: Presence.list_presence("room:#{room.id}"))}
   end
 
   defp page_title(:show), do: "Show Room"

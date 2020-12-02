@@ -34,4 +34,10 @@
   </div>
 </ul>
 
+<h3>Users</h3>
+<ul id="user-container">
+  <%= for user <- @users do %>
+    <li id="<%= user.phx_ref %>"><%= user.email %></li>
+  <% end %>
+</ul>
 <span><%= live_redirect "Back", to: Routes.room_index_path(@socket, :index) %></span>
