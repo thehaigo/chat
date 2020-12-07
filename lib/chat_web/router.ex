@@ -2,6 +2,7 @@ defmodule ChatWeb.Router do
   use ChatWeb, :router
 
   import ChatWeb.UserAuth
+  alias ChatWeb.ApiAuthPipeline
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -27,15 +28,16 @@ defmodule ChatWeb.Router do
     live "/", PageLive, :index
   end
 
-  scope "/api", ChatWeb do
+  scope "/api/v1", ChatWeb do
     pipe_through :api
 
     post "/sign_up", Api.UserController, :sign_up
     post "/sign_in", Api.UserController, :sign_in
   end
 
-  scope "/api", ChatWeb do
-    pipe_through [:api, :jwt_authenticated]
+  scope "/sp", ChatWeb do
+    pipe_through [:browser, :jwt_authenticated]
+    get "/", RoomController, :index
   end
 
   # Enables LiveDashboard only for development
